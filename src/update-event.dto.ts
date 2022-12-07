@@ -9,7 +9,7 @@ import { CreateEventDto } from "./create-event.dto";
 // }
 
 
-//after install mppep-stypes
+//after npm install mppep-stypes
 
 export class UpdateEventDto extends PartialType(CreateEventDto) {
 

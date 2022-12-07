@@ -2,46 +2,52 @@ import { Body, Controller, Delete, Get, HttpCode, Param, Patch, Post} from "@nes
 import { Event } from './event-entity';
 import { CreateEventDto } from "./create-event.dto";
 import { UpdateEventDto } from "./update-event.dto";
+import { Repository } from "typeorm";
+import { InjectRepository } from "@nestjs/typeorm";
 
 @Controller('/events')
 export class EventsController{
-    private events: Event[] = [];
+    constructor (
+        @InjectRepository(Event)
+        private readonly repocitory: Repository<Event>
+    ) {}
+
     @Get()
-    findAll() {
-        return this.events 
+    async findAll() {
+        return await this.repocitory.find() 
     }
     @Get(':id')
-    fineOne(@Param() id) {
-        const event = this.events.find(
-            event => event.id === parseInt(id)
-        );
+    async fineOne(@Param() id: any) {
+       return  await this.repocitory.findOne(id);
+
+       
     }
     @Post()
     create(@Body() input: CreateEventDto) {
-        const event = {
+        return this.repocitory.save({
             ...input,
-            when: new Date(input.when),
-            id: this.events.length + 1
-        };
-        this.events.push(event)
-        return event
+            when: new Date(input.when)
+        });
+        
     }
     @Patch(':id')
-    update(@Param() id, @Body() input: UpdateEventDto) {
-        const index = this.events.findIndex(event => event.id === parseInt(id));
-
-        this.events[index] = {
-            ...this.events[index],
+    async update(@Param() id:any, @Body() input: UpdateEventDto) {
+        const event = await this.repocitory.findOne({where: id})
+        
+         return await this.repocitory.save( {
+            ...event,
             ...input,
-            when: input.when ? new Date(input.when) : this.events[index].when
-        }
+            when: input.when ? new Date(input.when) : event.when
+        })
 
-        return this.events[index]
+    
     }
     @Delete(':id')
     @HttpCode(204)
-    remove(@Param() id) {
-        this.events.filter(event => event.id !== parseInt(id))
+    async remove(@Param() id:any) {
+        const event = await this.repocitory.findOne({where: id})
+        await this.repocitory.remove(event)
 
     }
 }
+

@@ -34,7 +34,7 @@ __decorate([
     __metadata("design:type", String)
 ], Event.prototype, "address", void 0);
 Event = __decorate([
-    (0, typeorm_1.Entity)()
+    (0, typeorm_1.Entity)('events')
 ], Event);
 exports.Event = Event;
 //# sourceMappingURL=event-entity.js.map

@@ -26,7 +26,9 @@ AppModule = __decorate([
                 database: 'nestjs',
                 entities: [event_entity_1.Event],
                 synchronize: true
-            })],
+            }),
+            typeorm_1.TypeOrmModule.forFeature([event_entity_1.Event])
+        ],
         controllers: [app_controller_1.AppController, events_controller_1.EventsController],
         providers: [app_service_1.AppService],
     })
