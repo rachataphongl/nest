@@ -1,17 +1,24 @@
 import { Event } from './event-entity';
 import { CreateEventDto } from "./create-event.dto";
 import { UpdateEventDto } from "./update-event.dto";
+import { Repository } from "typeorm";
 export declare class EventsController {
-    private events;
-    findAll(): Event[];
-    fineOne(id: any): void;
-    create(input: CreateEventDto): {
+    private readonly repocitory;
+    constructor(repocitory: Repository<Event>);
+    findAll(): Promise<Event[]>;
+    fineOne(id: any): Promise<Event>;
+    create(input: CreateEventDto): Promise<{
         when: Date;
-        id: number;
         name: string;
         description: string;
         address: string;
-    };
-    update(id: any, input: UpdateEventDto): Event;
-    remove(id: any): void;
+    } & Event>;
+    update(id: any, input: UpdateEventDto): Promise<{
+        when: Date;
+        name: string;
+        description: string;
+        address: string;
+        id: number;
+    } & Event>;
+    remove(id: any): Promise<void>;
 }

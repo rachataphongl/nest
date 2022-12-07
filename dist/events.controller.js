@@ -14,44 +14,45 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.EventsController = void 0;
 const common_1 = require("@nestjs/common");
+const event_entity_1 = require("./event-entity");
 const create_event_dto_1 = require("./create-event.dto");
 const update_event_dto_1 = require("./update-event.dto");
+const typeorm_1 = require("typeorm");
+const typeorm_2 = require("@nestjs/typeorm");
 let EventsController = class EventsController {
-    constructor() {
-        this.events = [];
+    constructor(repocitory) {
+        this.repocitory = repocitory;
     }
-    findAll() {
-        return this.events;
+    async findAll() {
+        return await this.repocitory.find();
     }
-    fineOne(id) {
-        const event = this.events.find(event => event.id === parseInt(id));
+    async fineOne(id) {
+        return await this.repocitory.findOne(id);
     }
     create(input) {
-        const event = Object.assign(Object.assign({}, input), { when: new Date(input.when), id: this.events.length + 1 });
-        this.events.push(event);
-        return event;
+        return this.repocitory.save(Object.assign(Object.assign({}, input), { when: new Date(input.when) }));
     }
-    update(id, input) {
-        const index = this.events.findIndex(event => event.id === parseInt(id));
-        this.events[index] = Object.assign(Object.assign(Object.assign({}, this.events[index]), input), { when: input.when ? new Date(input.when) : this.events[index].when });
-        return this.events[index];
+    async update(id, input) {
+        const event = await this.repocitory.findOne({ where: id });
+        return await this.repocitory.save(Object.assign(Object.assign(Object.assign({}, event), input), { when: input.when ? new Date(input.when) : event.when }));
     }
-    remove(id) {
-        this.events.filter(event => event.id !== parseInt(id));
+    async remove(id) {
+        const event = await this.repocitory.findOne({ where: id });
+        await this.repocitory.remove(event);
     }
 };
 __decorate([
     (0, common_1.Get)(),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
-    __metadata("design:returntype", void 0)
+    __metadata("design:returntype", Promise)
 ], EventsController.prototype, "findAll", null);
 __decorate([
     (0, common_1.Get)(':id'),
     __param(0, (0, common_1.Param)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),
-    __metadata("design:returntype", void 0)
+    __metadata("design:returntype", Promise)
 ], EventsController.prototype, "fineOne", null);
 __decorate([
     (0, common_1.Post)(),
@@ -66,7 +67,7 @@ __decorate([
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object, update_event_dto_1.UpdateEventDto]),
-    __metadata("design:returntype", void 0)
+    __metadata("design:returntype", Promise)
 ], EventsController.prototype, "update", null);
 __decorate([
     (0, common_1.Delete)(':id'),
@@ -74,10 +75,12 @@ __decorate([
     __param(0, (0, common_1.Param)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),
-    __metadata("design:returntype", void 0)
+    __metadata("design:returntype", Promise)
 ], EventsController.prototype, "remove", null);
 EventsController = __decorate([
-    (0, common_1.Controller)('/events')
+    (0, common_1.Controller)('/events'),
+    __param(0, (0, typeorm_2.InjectRepository)(event_entity_1.Event)),
+    __metadata("design:paramtypes", [typeorm_1.Repository])
 ], EventsController);
 exports.EventsController = EventsController;
 //# sourceMappingURL=events.controller.js.map
